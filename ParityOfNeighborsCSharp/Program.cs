@@ -35,9 +35,9 @@ namespace ParityOfNeighborsCSharp
             var array = str.Split();
             n = int.Parse(array[0]);
 
-            long evenCount = 0; // Количество чётных чисел
-            long oddCount = 0; // Количество нечётных чисел
-            List<CustomLong> numbers = new List<CustomLong>();
+            int evenCount = 0; // Количество чётных чисел
+            int oddCount = 0; // Количество нечётных чисел
+            List<int> numbers = new List<int>(n);
 
             str = Console.ReadLine();
             array = str.Split();
@@ -46,11 +46,11 @@ namespace ParityOfNeighborsCSharp
             int oddOutPlaceCount = 0;
             int evenOutPlaceCount = 0;
 
-            foreach (var item in array)
+            foreach (var item in array) //заменить на for
             {
-                long longVar = long.Parse(item);
-                bool isEven = longVar % 2 == 0;
-                numbers.Add(new CustomLong(longVar, isEven));
+                int intVar = int.Parse(item);
+                bool isEven = intVar % 2 == 0;
+                numbers.Add(intVar);
 
                 if ((i % 2 == 0) == isEven)
                     oddOutPlaceCount += 1;
@@ -74,27 +74,27 @@ namespace ParityOfNeighborsCSharp
 
             if (oddCount == evenCount)
             {
-                Rearrange(ref numbers, ref count, oddOutPlaceCount < evenOutPlaceCount);
+                count = Rearrange(numbers, count, oddOutPlaceCount < evenOutPlaceCount);
             }
             else
             {
-                Rearrange(ref numbers, ref count, oddCount > evenCount);
+                count = Rearrange(numbers, count, oddCount > evenCount);
             }
 
             Console.WriteLine(count);
             StringBuilder output = new StringBuilder();
             foreach (var number in numbers)
             {
-                output.Append(number.Number.ToString() + " ");
+                output.Append(number + " ");
             }
             Console.WriteLine(output);
         }
 
-        private static void CountOutPlace(List<CustomLong> numbers, ref int oddOutPlaceCount, ref int evenOutPlaceCount)
+        private static void CountOutPlace(List<int> numbers, ref int oddOutPlaceCount, ref int evenOutPlaceCount)
         {
             for (int i = 0; i < numbers.Count; i++)
             {
-                if ((i % 2 == 0) == numbers[i].IsEven)
+                if (i % 2 == numbers[i] % 2)
                     oddOutPlaceCount += 1;
                 else
                     evenOutPlaceCount += 1;
@@ -102,35 +102,37 @@ namespace ParityOfNeighborsCSharp
         }
 
 
-        private static void Rearrange(ref List<CustomLong> numbers, ref int count, bool oddGreater)
+        private static int Rearrange(List<int> numbers, int count, bool oddGreater)
         {
             int length = numbers.Count;
             for (int i = 0; i < length - 1; i++)
             {
-                if ((i % 2 == 0) == numbers[i].IsEven ^ !oddGreater)
+                if (i % 2 == numbers[i] % 2 ^ !oddGreater)
                     for (int j = i + 1; j < length; j++)
-                        if (j % 2 == 0 == numbers[j].IsEven ^ !oddGreater && numbers[i].IsEven != numbers[j].IsEven)
+                        if (j % 2 == numbers[j] % 2 ^ !oddGreater && numbers[i] % 2 != numbers[j] % 2)
                         {
-                            CustomLong oldFirst = numbers[i];
+                            int oldFirst = numbers[i];
                             numbers[i] = numbers[j];
                             numbers[j] = oldFirst;
                             count += 2;
                             break;
                         }
             }
+
+            return count;
         }
 
     }
 
-    public class CustomLong
-    {
-        public CustomLong(long number, bool isEven)
-        {
-            Number = number;
-            IsEven = isEven;
-        }
+    //public class CustomLong
+    //{
+    //    public CustomLong(long number, bool isEven)
+    //    {
+    //        Number = number;
+    //        IsEven = isEven;
+    //    }
 
-        public long Number { get; set; }
-        public bool IsEven { get; set; }
-    }
+    //    public long Number { get; set; }
+    //    public bool IsEven { get; set; }
+    //}
 }
