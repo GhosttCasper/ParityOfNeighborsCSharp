@@ -36,27 +36,26 @@ namespace ParityOfNeighborsCSharp
             n = int.Parse(array[0]);
 
             int evenCount = 0; // Количество чётных чисел
-            int oddCount = 0; // Количество нечётных чисел
+            int oddCount = 0;  // Количество нечётных чисел
             List<int> numbers = new List<int>(n);
 
             str = Console.ReadLine();
             array = str.Split();
 
-            int i = 0;
-            int oddOutPlaceCount = 0;
-            int evenOutPlaceCount = 0;
+            int amountNumbersInTheirPlacesIfFirstIsEven = 0; // количество чисел на своих местах, если первое число чётное
+            int amountNumbersInTheirPlacesIfFirstIsOdd = 0; // количество чисел на своих местах, если первое число нечётное
 
-            foreach (var item in array) //заменить на for
+            for (int i = 0; i < n; i++)
             {
-                int intVar = int.Parse(item);
-                bool isEven = intVar % 2 == 0;
+                int intVar = int.Parse(array[i]);
                 numbers.Add(intVar);
 
+                bool isEven = intVar % 2 == 0;
+
                 if ((i % 2 == 0) == isEven)
-                    oddOutPlaceCount += 1;
+                    amountNumbersInTheirPlacesIfFirstIsEven += 1;
                 else
-                    evenOutPlaceCount += 1;
-                i++;
+                    amountNumbersInTheirPlacesIfFirstIsOdd += 1;
 
                 if (isEven)
                     evenCount += 1;
@@ -70,16 +69,8 @@ namespace ParityOfNeighborsCSharp
                 return;
             }
 
-            int count = 0;
-
-            if (oddCount == evenCount)
-            {
-                count = Rearrange(numbers, count, oddOutPlaceCount < evenOutPlaceCount);
-            }
-            else
-            {
-                count = Rearrange(numbers, count, oddCount > evenCount);
-            }
+            bool firstIsOdd = oddCount == evenCount ? amountNumbersInTheirPlacesIfFirstIsOdd > amountNumbersInTheirPlacesIfFirstIsEven : oddCount > evenCount;
+            int count = Rearrange(numbers, n, firstIsOdd);
 
             Console.WriteLine(count);
             StringBuilder output = new StringBuilder();
@@ -90,49 +81,31 @@ namespace ParityOfNeighborsCSharp
             Console.WriteLine(output);
         }
 
-        private static void CountOutPlace(List<int> numbers, ref int oddOutPlaceCount, ref int evenOutPlaceCount)
+        private static int Rearrange(List<int> numbers, int n, bool firstIsOdd)
         {
-            for (int i = 0; i < numbers.Count; i++)
+            Stack<int> outPlaceOdd = new Stack<int>(); // нечетные числа не на своих местах
+            Stack<int> outPlaceEven = new Stack<int>(); // четные числа не на своих местах
+            for (int i = 0; i < n; i++)
             {
-                if (i % 2 == numbers[i] % 2)
-                    oddOutPlaceCount += 1;
-                else
-                    evenOutPlaceCount += 1;
+                if (i % 2 == numbers[i] % 2 ^ !firstIsOdd) // если число не своем месте
+                    if (numbers[i] % 2 == 1)    // если число нечетное
+                        outPlaceOdd.Push(numbers[i]);
+                    else                        // иначе число четное
+                        outPlaceEven.Push(numbers[i]);
             }
-        }
 
+            int count = outPlaceOdd.Count + outPlaceEven.Count;
 
-        private static int Rearrange(List<int> numbers, int count, bool oddGreater)
-        {
-            int length = numbers.Count;
-            for (int i = 0; i < length - 1; i++)
+            for (int j = 0; j < n; j++)
             {
-                if (i % 2 == numbers[i] % 2 ^ !oddGreater)
-                    for (int j = i + 1; j < length; j++)
-                        if (j % 2 == numbers[j] % 2 ^ !oddGreater && numbers[i] % 2 != numbers[j] % 2)
-                        {
-                            int oldFirst = numbers[i];
-                            numbers[i] = numbers[j];
-                            numbers[j] = oldFirst;
-                            count += 2;
-                            break;
-                        }
+                if (j % 2 == numbers[j] % 2 ^ !firstIsOdd)
+                    if (numbers[j] % 2 == 1)
+                        numbers[j] = outPlaceEven.Pop();
+                    else
+                        numbers[j] = outPlaceOdd.Pop();
             }
 
             return count;
         }
-
     }
-
-    //public class CustomLong
-    //{
-    //    public CustomLong(long number, bool isEven)
-    //    {
-    //        Number = number;
-    //        IsEven = isEven;
-    //    }
-
-    //    public long Number { get; set; }
-    //    public bool IsEven { get; set; }
-    //}
 }
